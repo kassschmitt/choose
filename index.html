@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<!-- scripted with love in 1997 by kass@hot-schmitt.co.uk
+     with help from yoz@yoz.com. enjoy! 
+     entry for Ars Electronica formart competition
+
+  Single‑file 2025 revival of Kass & Yoz’s 1997 entry to the first International
+  Form‑Art Competition, conceived and hosted by artist Alexei Shulgin as his
+  contribution to the 1997 Ars Electronica held in Linz, Austria.
+
+  see https://www.c3.hu/collection/form/
+
+  The work was awarded a joint first place and was susequently featured in
+  the book 'Internet Art (World of Art)' by Rachel Greene (Thames & Hudson 2004)
+
+  This edition strips styling back to ~1997 defaults—no Flexbox, no CSS Grid.
+  Only a few tiny rules keep tables tight and checkboxes flush, just as Netscape 3
+  displayed them.
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Choose</title>
+  <style>
+    body{margin:0;text-align:center;font:menu;}
+    table{margin:0 auto;border-collapse:collapse;}
+    td{padding:0;}
+    input[type=checkbox]{display:block;margin:0;padding:0;accent-color:#7f7f7f;}
+  </style>
+</head>
+<body>
+
+<!-- top scrolling matrix -------------------------------------------------->
+<form id="matrixForm"></form>
+<p></p>
+<!-- lower interactive grid ------------------------------------------------>
+<form id="gridForm"></form>
+
+<script>
+// ───────────────────────────────────────────────────────────────────────────
+// 1. 12‑row × variable width dot‑matrix font  (exact dump from 1997 code)
+// -------------------------------------------------------------------------
+const font = {
+  " ": "000000000000000",
+  "-": "040040040040040000",
+  "A": "0080180e8340c403400e8018008000",
+  "B": "808ff8888888888d98770000",
+  "C": "1c0630c18808808418e30000",
+  "D": "808ff8808808808c186301c0000",
+  "E": "808ff88888888889c8c18000",
+  "F": "808ff88888888809c0c00000",
+  "G": "1c0630c18808808498ef0080000",
+  "H": "808ff8888080080888ff8808000",
+  "I": "808ff8808000",
+  "J": "018808ff0800000",
+  "K": "808ff88881c0a60c38818008000",
+  "L": "808ff8808008008018000",
+  "M": "808ff8608180060018060180608ff8808000",
+  "N": "808ff86081000c0020810ff8800000",
+  "O": "1c0630c18808808c186301c0000",
+  "P": "808ff8888880880d80700000",
+  "Q": "1c0630c1880880cc1c6321c2000",
+  "R": "808ff88888808c0da0718008000",
+  "S": "6389109888884d8e70000",
+  "T": "c00800808ff8808800c00000",
+  "U": "800ff0818008008818ff0800000",
+  "V": "800c00b000e00380e0b00c00800000",
+  "W": "800e00b800e0838ec0b800e00389c0e00800000",
+  "X": "808c18b681801c0a68c18808000",
+  "Y": "800c00a001880f8088b00c00800000",
+  "Z": "c388688c8988b08e08c18000",
+  "a": "0b01481480f0008000",
+  "b": "800ff81081080f0000",
+  "c": "0f0108108090000",
+  "d": "0f0108908ff0008000",
+  "e": "0f01581480c8010000",
+  "f": "1007f8900000",
+  "g": "0e61391291c9106000",
+  "h": "808ff81081000f8008000",
+  "i": "1089f8008000",
+  "j": "1019fe000",
+  "k": "800ff80400a0118008000",
+  "l": "808ff8008000",
+  "m": "1080f81081000f81081000f8008000",
+  "n": "1080f81081000f8008000",
+  "o": "0f01081080f0000",
+  "p": "1011ff1091080f0000",
+  "q": "0f01081091ff001000",
+  "r": "1080f8188100000",
+  "s": "0d81481281b0000",
+  "t": "1003f0108108000",
+  "u": "1001f00081081f0008000",
+  "v": "1001e00180701c0100000",
+  "w": "1001c01780101e01180601c0100000",
+  "x": "108198060198108000",
+  "y": "1011e301c0701c0100000",
+  "z": "198128148198000"
+};
+
+// ───────────────────────────────────────────────────────────────────────────
+// 2. Config constants 
+// -------------------------------------------------------------------------
+const MATRIX_ROWS=12,MATRIX_COLS=48; 
+const GRID_SIZE=16;                  
+const UNCHECKED_THRESHOLD=93;
+const CHECKED_THRESHOLD=61;
+const FRAME_DELAY=35;                
+
+// Message pools lifted from check0.html / check1.html
+const msgsUnchecked = [
+  "smoking or non‑smoking  ",
+  "soup or salad  ",
+  "manual or automatic  ",
+  "bike or walk  ",
+  "skateboard or rollerblade  ",
+  "bus or train  ",
+  "coffee or tea  ",
+  "digital or analogue  ",
+  "organically or conventionally grown  ",
+  "condom or the pill  ",
+  "sweet or salty  ",
+  "private or public school  ",
+  "breast milk or formula  ",
+  "boat or plane  ",
+  "petrol or diesel  ",
+  "work or play   ",
+  "real or artificial   ",
+  "dark or milk chocolate   ",
+  "sunblock or baby oil   ",
+  "still or sparkling   ",
+  "paper or plastic   ",
+  "Mac or PC   ",
+  "regular or sugar-free   ",
+  "country or city   ",
+  "rent or own   ",
+  "cash or credit   ",
+  "blue or brown   ",
+  "chicken or beef   ",
+  "baked or fried   ",
+  "full fat or semi-skimmed   ",
+  "surface or air   ",
+  "shoes or sneakers   ",
+  "eat in or take away   ",
+  "live or recorded   ",
+  "Finchley Central or Mill Hill East   ",
+  "now or later   "
+];
+    
+const msgsChecked = [
+  "Pleasure or Pain   ",
+  "Sanity or Madness   ",
+  "Vice or Virtue   ",
+  "Generosity or Greed   ",
+  "Beauty or Ugliness   ",
+  "Chaos or Order   ",
+  "Vanity or Humility   ",
+  "Diligence or Laziness   ",
+  "Sadness or Joy   ",
+  "Clean or Dirty   ",
+  "Full or Empty   ",
+  "Love or Hate   ",
+  "Calm or Hectic   ",
+  "Rich or Poor   ",
+  "Talk or Action   "
+];
+
+let currentPool=msgsUnchecked;
+
+// ───────────────────────────────────────────────────────────────────────────
+// 3. Build DOM exactly like the old frameset pages (tables all the way)
+// -------------------------------------------------------------------------
+const matrixForm=document.getElementById('matrixForm');
+const gridForm=document.getElementById('gridForm');
+
+const matrixCells=[];
+const gridCells=[];
+
+(function buildMatrix(){
+  const tbl=document.createElement('table');
+  tbl.cellPadding=0;tbl.cellSpacing=0;tbl.border=0;
+  for(let r=0;r<MATRIX_ROWS;r++){
+    const tr=tbl.insertRow();
+    for(let c=0;c<MATRIX_COLS;c++){
+      const td=tr.insertCell();
+      const cb=document.createElement('input');
+      cb.type='checkbox';
+      cb.disabled=false;
+      td.appendChild(cb);
+      matrixCells.push(cb);
+    }
+  }
+  matrixForm.appendChild(tbl);
+})();
+
+(function buildGrid(){
+  const tbl=document.createElement('table');
+  tbl.cellPadding=0;tbl.cellSpacing=0;tbl.border=0;
+  let i=0;
+  for(let r=0;r<GRID_SIZE;r++){
+    const tr=tbl.insertRow();
+    for(let c=0;c<GRID_SIZE;c++){
+      const td=tr.insertCell();
+      const cb=document.createElement('input');
+      cb.type='checkbox';
+      cb.name='boxes';
+      cb.dataset.idx=i
+      cb.addEventListener('click',onGridClick);
+      td.appendChild(cb);
+      gridCells[i++]=cb;
+    }
+  }
+  gridForm.appendChild(tbl);
+})();
+
+// ───────────────────────────────────────────────────────────────────────────
+// 4. Geometry helpers to set ☐ / ✓ patterns in the grid
+// -------------------------------------------------------------------------
+function setUncheckedPattern(){
+  gridCells.forEach((cb,i)=>{
+    const r=Math.floor(i/GRID_SIZE),c=i%GRID_SIZE;
+    cb.checked=(r===0||r===GRID_SIZE-1||c===0||c===GRID_SIZE-1); // perimeter only
+  });
+  console.info('[Grid] pattern ☐ set');
+}
+
+function setCheckedPattern(){
+  // crude tick shape copied from check1.html positions
+    const tickPos=new Set([59,60,61,75,76,90,91,106,107,121,122,130,131,132,137,138,147,148,149,152,153,164,165,166,168,169,181,182,183,184,198,199,200,215]);
+
+  gridCells.forEach((cb,i)=>{
+    const row=Math.floor(i/GRID_SIZE), col=i%GRID_SIZE;
+    console.log(`[Grid click] i=${i} (row ${row}, col ${col})`);
+    cb.checked=!(tickPos.has(i)||row===0||row===GRID_SIZE-1||col===0||col===GRID_SIZE-1);
+  });		      
+  console.info('[Grid] pattern ✓ set');
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// 5. Message scroller (direct port of original logic with a spacer col)
+// -------------------------------------------------------------------------
+let msgIndex=0;
+let scrollerMsg=currentPool[msgIndex];
+console.log('[Scroller]',`“${scrollerMsg.trim()}”`);
+
+let letpos=0,strpos=0;
+
+function nextSlice(){
+  if(letpos===font[scrollerMsg[strpos]].length){
+    // spacer column = all zeros
+    letpos=0;
+    strpos=(strpos+1)%scrollerMsg.length;
+  }
+  const hex=font[scrollerMsg[strpos]].substring(letpos,letpos+3);
+  let dec=parseInt(hex||'000',16);
+  const slice=new Array(MATRIX_ROWS);
+  for(let i=MATRIX_ROWS-1;i>=0;i--){
+    slice[i]=(dec&1)!==0;
+    dec>>=1;
+  }
+  letpos+=3;
+  return slice;
+}
+
+function shiftLeft(){
+  const slice=nextSlice();
+  for(let i=0;i<MATRIX_ROWS*MATRIX_COLS;i++){
+    if(i%MATRIX_COLS===MATRIX_COLS-1){
+      matrixCells[i].checked=slice[Math.floor(i/MATRIX_COLS)];
+    }else{
+      matrixCells[i].checked=matrixCells[i+1].checked;
+    }
+  }
+}
+
+setInterval(shiftLeft,FRAME_DELAY);
+
+// ───────────────────────────────────────────────────────────────────────────
+// 6. Grid interaction → pool / pattern swap
+// -------------------------------------------------------------------------
+function onGridClick(ev){
+  const idx=Number(ev.target.dataset.idx);
+  const row=Math.floor(idx/GRID_SIZE), col=idx%GRID_SIZE;
+  console.log(`[Grid click] idx=${idx} (row ${row}, col ${col})`);
+  const count=gridCells.filter(cb=>cb.checked).length;
+
+  if(currentPool===msgsUnchecked){
+    if(count>UNCHECKED_THRESHOLD){
+      currentPool=msgsChecked;
+      setCheckedPattern();
+    }
+    swapMessagePool();
+  } else if(currentPool===msgsChecked){
+    if(count<CHECKED_THRESHOLD){
+      currentPool=msgsUnchecked;
+      setUncheckedPattern();
+    }		
+    swapMessagePool();
+  } 
+}
+
+function swapMessagePool(){
+  msgIndex=Math.floor(Math.random()*currentPool.length);
+  scrollerMsg=currentPool[msgIndex];
+  letpos=0;strpos=0;
+  console.log('[Scroller]',`“${scrollerMsg.trim()}”`);
+}
+
+// initial state
+setUncheckedPattern();
+</script>
+</body>
+</html>
+ 

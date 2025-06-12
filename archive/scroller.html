@@ -1,0 +1,147 @@
+<html><head></head>
+<body>
+<center>
+<!-- scripted with love in 1997 by kass@hot-schmitt.co.uk, enjoy! -->
+<!-- entry for Ars Electronica formart competition -->
+<script language="javascript">
+<!--
+var font = new Array();
+font[" "] = new String("000000000000000");
+font["-"] = new String("040040040040040000");
+font["A"] = new String("0080180e8340c403400e8018008000");
+font["B"] = new String("808ff8888888888d98770000");
+font["C"] = new String("1c0630c18808808418e30000");
+font["D"] = new String("808ff8808808808c186301c0000");
+font["E"] = new String("808ff88888888889c8c18000");
+font["F"] = new String("808ff88888888809c0c00000");
+font["G"] = new String("1c0630c18808808498ef0080000");
+font["H"] = new String("808ff8888080080888ff8808000");
+font["I"] = new String("808ff8808000");
+font["J"] = new String("018808ff0800000");
+font["K"] = new String("808ff88881c0a60c38818008000");
+font["L"] = new String("808ff8808008008018000");
+font["M"] = new String("808ff8608180060018060180608ff8808000");
+font["N"] = new String("808ff86081000c0020810ff8800000");
+font["O"] = new String("1c0630c18808808c186301c0000");
+font["P"] = new String("808ff8888880880d80700000");
+font["Q"] = new String("1c0630c1880880cc1c6321c2000");
+font["R"] = new String("808ff88888808c0da0718008000");
+font["S"] = new String("6389109888884d8e70000");
+font["T"] = new String("c00800808ff8808800c00000");
+font["U"] = new String("800ff0818008008818ff0800000");
+font["V"] = new String("800c00b000e00380e0b00c00800000");
+font["W"] = new String("800e00b800e0838ec0b800e00389c0e00800000");
+font["X"] = new String("808c18b681801c0a68c18808000");
+font["Y"] = new String("800c00a001880f8088b00c00800000");
+font["Z"] = new String("c388688c8988b08e08c18000");
+font["a"] = new String("0b01481480f0008000");
+font["b"] = new String("800ff81081080f0000");
+font["c"] = new String("0f0108108090000");
+font["d"] = new String("0f0108908ff0008000");
+font["e"] = new String("0f01581480c8010000");
+font["f"] = new String("1007f8900000");
+font["g"] = new String("0e61391291c9106000");
+font["h"] = new String("808ff81081000f8008000");
+font["i"] = new String("1089f8008000");
+font["j"] = new String("1019fe000");
+font["k"] = new String("800ff80400a0118008000");
+font["l"] = new String("808ff8008000");
+font["m"] = new String("1080f81081000f81081000f8008000");
+font["n"] = new String("1080f81081000f8008000");
+font["o"] = new String("0f01081080f0000");
+font["p"] = new String("1011ff1091080f0000");
+font["q"] = new String("0f01081091ff001000");
+font["r"] = new String("1080f8188100000");
+font["s"] = new String("0d81481281b0000");
+font["t"] = new String("1003f0108108000");
+font["u"] = new String("1001f00081081f0008000");
+font["v"] = new String("1001e00180701c0100000");
+font["w"] = new String("1001c01780101e01180601c0100000");
+font["x"] = new String("108198060198108000");
+font["y"] = new String("1011e301c0701c0100000");
+font["z"] = new String("198128148198000");
+
+var numrows = 12;
+var numcols = 30;
+var timeout = null;
+var scrawl = new checkboxMessageScroller(" ",25);
+
+function autopilot(){
+	shiftleft();
+	timeout = setTimeout("autopilot()",scrawl.delay);
+}
+
+function shiftleft(){
+	scrawl.advance();
+	for(i=0;i<numrows*numcols;i++){
+		if (i%numcols == numcols-1){	
+			document.myform.elements[i].checked = scrawl.slice[Math.floor(i/numcols)];
+		} else {
+			document.myform.elements[i].checked = document.myform.elements[i+1].checked;
+		}
+	}
+}	
+
+function checkboxMessageScroller(s,d) {
+  this.msg = s;
+  this.letpos = 0
+  this.strpos = 0
+  this.delay = d
+  this.resetMessage = clearMessage
+  this.newMessage = newMessage
+  this.advance = advanceMessage
+  this.slice = new Array(12);
+  this.getslice = getSlice;
+}
+
+function getSlice(){
+ var dec = parseInt(font[this.msg.substring(this.strpos,this.strpos+1)].substring(this.letpos,this.letpos+3) ,16);
+  for(i=11;i>=0;i--){
+	this.slice[i]=(dec%2==1);
+	dec = Math.floor(dec/2);
+  }
+}
+
+function advanceMessage(){
+  this.getslice();
+  this.letpos = (this.letpos +3)%font[this.msg.substring(this.strpos,this.strpos+1)].length;
+  if (this.letpos == 0){
+	this.strpos = (this.strpos + 1)%this.msg.length;
+  }
+}
+
+function clearMessage() {
+  this.msg = " ";
+  this.strpos = 0;
+  this.letpos = 0;
+  for(i=0;i<numrows*numcols;i++){
+	document.myform.elements[i].checked = false;
+  }
+}
+
+function newMessage(s) {
+  this.msg = s;
+  this.strpos = 0;
+  this.letpos = 0;
+  for(i=0;i<numrows*numcols;i++){
+	document.myform.elements[i].checked = false;
+  }
+}
+
+document.writeln('<TABLE CELLSPACING=0 BORDER=0 CELLPADDING=0>');
+document.writeln('<form name="myform">');
+for(i=0;i<numrows;i++){
+	document.write('<tr>');
+	for(j=0;j<numcols;j++){
+	document.write('<td><input type="checkbox" name="screen" onClick="0"> </td>');
+}
+	document.writeln('</tr>');
+}
+document.writeln('</form></table>');
+document.writeln('<p>');
+document.writeln('</center></body></html>');
+scrawl.resetMessage();
+autopilot();
+//-->
+</script>
+
